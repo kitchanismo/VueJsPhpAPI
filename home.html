@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!--created by kitchanismo-->
+	<title>Library System</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="assets/css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="css/home.css">
+	<link rel="stylesheet" type="text/css" href="assets/font-awesome/css/font-awesome.css">
+	<script type="text/javascript" src="assets/js/vue.js"></script>
+</head>
+<body>
+	<div class="nav">
+		<h1>Library System </h1>
+	</div>
+	<div id="app">
+	<!--side view section-->
+	<div class="side-menu">
+		<a href="#"><i v-on:click="showbooklist= true; showbookmaintenance = false;" class="fa fa-list-ul"></i></a>
+		<hr>
+		<a href="#" class="bklist"><i v-on:click="showbookmaintenance = true; showbooklist = false;" class="fa fa-book"></i></a>
+		<hr>		
+		<a href="#" class="borrow"><i class="fa fa-cart-plus"></i></a>
+		<hr>
+		<a href="#" class="users"><i class="fa fa-users"></i></a>
+		<hr>
+		<a href="#" class="setting"><i class="fa fa-gear"></i></a>
+		<hr>
+		<a href="#" class="signout" v-on:click="successMessage='Signing out ...';signoutUser();">Sign Out</i></a>
+	</div>
+		<!--add books section-->
+		<div class="add-container" v-if="showadd">
+			<h2>Add books</h2>
+			<hr>
+			<p class="errorAdd" v-if="errorAdd">
+				{{errorAdd}}
+			</p>
+			<input type="text" v-model="newbooks.title" class="form-control" placeholder="Enter Title">
+			<input type="text" v-model="newbooks.category" class="form-control" placeholder="Enter Category">
+			<input type="text" v-model="newbooks.author" class="form-control" placeholder="Enter Author">
+			<input type="text" v-model="newbooks.publisher" name="email" class="form-control" placeholder="Enter Publisher">
+			<input type="text" v-model="newbooks.qty" name="email" class="form-control" placeholder="Enter Quantity">
+			<br>
+			<button v-on:click="onValidationAdd" class="btn btn-primary">Save</button>
+			<button class="btn btn-warning" v-on:click="showadd=false;showmodal=false;">Cancel</button>
+		</div>
+		<!--edit books section-->
+		<div class="edit-container" v-if="showedit">
+			<h2>Edit books</h2>
+
+			<hr>
+			<p class="errorEdit" v-if="errorEdit">
+				{{errorEdit}}
+			</p>
+			Title
+			<input type="text" v-model="clickedbooks.title" class="form-control" placeholder="Enter Title">
+			Category
+			<input type="text" v-model="clickedbooks.category" name="email" class="form-control" placeholder="Enter Category">
+			Author
+			<input type="text" v-model="clickedbooks.author" class="form-control" placeholder="Enter Author">
+			Publisher
+			<input type="text" v-model="clickedbooks.publisher" name="email" class="form-control" placeholder="Enter Publisher">
+			Quantity
+			<input type="text" v-model="clickedbooks.qty" name="email" class="form-control" placeholder="Enter Quantity">
+			<br>
+			<button v-on:click="onValidationEdit" class="btn btn-primary">Update</button>
+			<button class="btn btn-warning" v-on:click="showedit=false; showmodal=false;loadbooks();">Cancel</button>
+		</div>
+		<!--remove books section-->
+		<div class="remove-container" v-if="showremove">
+			<h2>Remove books</h2>
+			<hr>
+			<p>Are you sure do you want to delete <span>{{clickedbooks.title}}</span>?</p>
+		
+			<button v-on:click="crudBooks('delete')" class="btn btn-primary">Delete</button>
+			<button class="btn btn-warning" v-on:click="showremove=false; showmodal=false; loadbooks();">Cancel</button>
+		</div>
+		<!--modal section-->
+		<div class="modal-container" v-if="showmodal">
+		</div>
+		<!--books list section-->
+		<div class="book-list" v-if="showbooklist">
+			<table class="tblsearch">
+				<tr>
+					<h2>Book List</h2>
+				</tr>
+				<tr>
+					<td class="search-text">
+						<input v-on:keyup="searchBooks" v-model="searchKey" type="text" class="form-control" placeholder="Search here" >
+						<div v-bind:class="(showdropsearchlist == false) ? 'btn-group' : 'btn-group show'" v-on:click="showdropsearchlist = !showdropsearchlist">
+						  <button type="button" class="btn btn-secondary">{{selectedSearchBy}}</button>
+						  <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						    <span class="sr-only">Toggle Dropdown</span>
+						  </button>
+						  <div class="dropdown-menu">
+						    <a class="dropdown-item" v-on:click="selectedSearchBy=searchBy.title" href="#">{{searchBy.title}}</a>
+						    <a class="dropdown-item" v-on:click="selectedSearchBy=searchBy.category"  href="#">{{searchBy.category}}</a>
+						    <a class="dropdown-item" v-on:click="selectedSearchBy=searchBy.author"  href="#">{{searchBy.author}}</a>
+						    <a class="dropdown-item" v-on:click="selectedSearchBy=searchBy.publisher"  href="#">{{searchBy.publisher}}</a>
+						  </div>
+						</div>
+					</td>
+					<td class="refreshAdd">
+						<p class="tag">Refresh<p>
+						<a href="#"><i v-on:click="loadbooks(); clearMessage(); searchKey='';successMessage = 'Refreshing ...'; hideMessage(500);" class="fa fa-refresh"></i></a>
+					</td>
+				</tr>
+				<tr>
+					<td class="notif-area" colspan="4">
+						<div class="message">
+			 				<p class="errorMessage" v-if="errorMessage">
+								{{errorMessage}}
+							</p>
+							<p class="successMessage" v-if="successMessage">
+								{{successMessage}}
+							</p>
+						</div>
+					</td>
+					<td></td>
+					<td></td>
+				</tr>
+			</table>
+			<table class="table table-hover">
+				<thead>
+				  <tr>
+				    <th>#</th>
+				    <th>Title</th>
+				    <th>Category</th>
+				    <th>Author</th>
+				    <th>Publisher</th>
+				    <th>Quantity</th>
+				  </tr>
+				</thead>
+				<tbody>
+				  <tr v-for="book in books">
+				    <th scope="row">{{book.bookid}}</th>
+				    <td>{{book.title}}</td>
+				    <td>{{book.category}}</td>
+				    <td>{{book.author}}</td>
+				    <td>{{book.publisher}}</td>
+				    <td>{{book.qty}}</td>
+				  </tr>
+				</tbody>
+			</table>
+		</div>
+		<!--books maintenance section-->
+		<div class="book-maintenance" v-if="showbookmaintenance">
+			<table class="tblsearch">
+				<tr>
+					<h2>Book Maintenance</h2>
+				</tr>
+				<tr>
+					<td class="search-text" colspan="2">
+						<input v-on:keyup="searchBooks" v-model="searchKey" type="text" class="form-control" name="" placeholder="Search here" >
+						<div v-bind:class="(showdropsearchmaintenance == false) ? 'btn-group' : 'btn-group show'" v-on:click="showdropsearchmaintenance = !showdropsearchmaintenance">
+						  <button type="button" class="btn btn-secondary">{{selectedSearchBy}}</button>
+						  <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						    <span class="sr-only">Toggle Dropdown</span>
+						  </button>
+						  <div class="dropdown-menu">
+						    <a class="dropdown-item" v-on:click="selectedSearchBy=searchBy.title" href="#">{{searchBy.title}}</a>
+						    <a class="dropdown-item" v-on:click="selectedSearchBy=searchBy.category"  href="#">{{searchBy.category}}</a>
+						    <a class="dropdown-item" v-on:click="selectedSearchBy=searchBy.author"  href="#">{{searchBy.author}}</a>
+						    <a class="dropdown-item" v-on:click="selectedSearchBy=searchBy.publisher"  href="#">{{searchBy.publisher}}</a>
+						  </div>
+						</div>
+					</td>
+					<td class="refreshAdd">
+						<p class="tag">Refresh<p>
+						<a href="#"><i v-on:click="loadbooks(); clearMessage(); searchKey=''; successMessage = 'Refreshing ...'; hideMessage(500);" class="fa fa-refresh"></i></a>
+					</td>
+					<td class="refreshAdd">
+						<p class="tag">Add<p>
+						<a href="#"><i v-on:click="showadd=true;showmodal=true;" class="fa fa-plus"></i></a>
+					</td>
+				</tr>
+				<tr>
+					<td class="notif-area" colspan="4">
+						<div class="message">
+			 				<p class="errorMessage" v-if="errorMessage">
+								{{errorMessage}}
+							</p>
+							<p class="successMessage" v-if="successMessage">
+								{{successMessage}}
+							</p>
+						</div>
+					</td>
+					<td></td>
+					<td></td>
+				</tr>
+			</table>
+			<table class="table table-hover">
+				<thead>
+				  <tr>
+				    <th>#</th>
+				    <th>Title</th>
+				    <th>Category</th>
+				    <th>Author</th>
+				    <th>Publisher</th>
+				    <th>Quantity</th>
+				    <th>Edit</th>
+				    <th>Delete</th>
+				  </tr>
+				</thead>
+				<tbody>
+				  <tr v-for="book in books">
+				    <th scope="row">{{book.bookid}}</th>
+				    <td>{{book.title}}</td>
+				    <td>{{book.category}}</td>
+				    <td>{{book.author}}</td>
+				    <td>{{book.publisher}}</td>
+				    <td>{{book.qty}}</td>
+				    <td><a href="#" ><i v-on:click="selectBook(book); showedit=true; showmodal=true;" class="fa fa-edit"></i></a></td>
+				    <td><a href="#"><i v-on:click="selectBook(book); showremove=true; showmodal=true;" class="fa fa-remove"></i></a></td>
+				  </tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<!--js section-->
+	<script type="text/javascript" src="assets/js/axios.js"></script>
+	<script type="text/javascript" src="js/home.js"></script>
+</body>
+</html>

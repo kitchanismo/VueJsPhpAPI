@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Library System</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="assets/css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="css/index.css">
+	<link rel="stylesheet" type="text/css" href="assets/font-awesome/css/font-awesome.css">
+	<script type="text/javascript" src="assets/js/vue.js"></script>
+</head>
+<body>
+	<div id="app">
+		<div class="wrapper">
+			<div class="header">
+				
+			</div>
+			<div class="content">
+				<div class="jumbotron">
+				  <h1 class="display-5">Hello, world!</h1>
+				  <p class="lead">This is a simple hero un calling extra attention to featu calling extra attention to featuit, a simple jumbotron-style component for
+				  <p class="lead">This is impleotron-style component for
+				                  calling on to featured content or information.</p>
+			
+				  <p class="lead">
+				    <a class="btn btn-primary btn-lg" href="#" role="button">Read more ...</a>
+				  </p>
+				</div>
+			</div>
+			
+			<div class="signin-container">
+				<h2>Sign in </h2> <p>Student | Visitors | Librarian</p>
+				<div class="message">
+	 				<p class="errorMessage" v-if="errorMessage">
+						{{errorMessage}}
+					</p>
+					<p class="successMessage" v-if="successMessage">
+						{{successMessage}}
+					</p>
+				</div>
+				<input type="text" v-model="loginuser.username" name="uname" class="form-control" placeholder="Username">
+				<input type="password" v-model="loginuser.password" name="pword" class="form-control" placeholder="Password">
+				<button v-on:click="onValidationSignin" class="btn btn-primary">Submit</button>
+			</div>
+			<hr>
+			<div class="signup-container">
+				<h2>Sign up </h2><p>Visitors | Student</p>
+				<div class="message">
+	 				<p class="errorMessage" v-if="errorCreate">
+						{{errorCreate}}
+					</p>
+					<p class="successMessage" v-if="successCreate">
+						{{successCreate}}
+					</p>
+				</div>
+				<input type="text" v-model="newuser.username" v-on:keyup="isUserExist" name="uname" class="form-control" placeholder="Username">
+				<input type="text" v-model="newuser.email" name="email" class="form-control" placeholder="Email Address">
+				<input type="password" v-model="newuser.password" name="pword" class="form-control" placeholder="Password">
+				<input type="password" v-model="repassword" name="cpword" class="form-control" placeholder="Confirm Password">
+				<button  v-on:click="onValidationSignup();" class="btn btn-primary">Submit</button>
+			</div>
+
+			<div class="footer">
+				<a href="#"><i class="fa fa-facebook"></i></a>
+				<a href="#"><i class="fa fa-twitter"></i></a>
+				<a href="#"><i class="fa fa-phone"></i></a>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="assets/js/axios.js"></script>
+	<script type="text/javascript" src="js/index.js"></script>
+
+</body>
+</html>
